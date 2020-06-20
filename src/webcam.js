@@ -1,7 +1,7 @@
 const enumerateDevices = require('enumerate-devices')
 
-module.exports = function (deviceId) {
-  return enumerateDevices()
+module.exports = deviceId => (
+  enumerateDevices()
     .then(devices => devices.filter(devices => devices.kind === 'videoinput'))
     .then(cameras => {
       let constraints = { audio: false, video: true}
@@ -17,11 +17,11 @@ module.exports = function (deviceId) {
       const video = document.createElement('video')
       //  video.src = window.URL.createObjectURL(stream)
       video.srcObject = stream
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         video.addEventListener('loadedmetadata', () => {
           video.play().then(() => resolve({video: video}))
         })
       })
     })
     .catch(console.log.bind(console))
-}
+)
