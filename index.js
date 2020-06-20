@@ -6,7 +6,9 @@ const mouse = require('mouse-change')()
 const Audio = require('./src/audio.js')
 const VidRecorder = require('./src/video-recorder.js')
 
-// to do: add ability to pass in certain uniforms and transforms
+/* 
+ * TODO: Add ability to pass in certain uniforms and transforms
+ */
 class HydraSynth {
 
   constructor ({
@@ -50,18 +52,17 @@ class HydraSynth {
     if (enableStreamCapture) {
       this.captureStream = this.canvas.captureStream(25)
 
-      // to do: enable capture stream of specific sources and outputs
+      /* 
+       * TODO: Enable capture stream of specific sources and outputs
+       */
       window.vidRecorder = new VidRecorder(this.captureStream)
     }
 
     if(detectAudio) this._initAudio()
-    //if(makeGlobal) {
-      window.mouse = mouse
-      window.time = this.time
-      window['render'] = this.render.bind(this)
-    //  window.bpm = this.bpm
-      window.bpm = this._setBpm.bind(this)
-  //  }
+    window.mouse = mouse
+    window.time = this.time
+    window['render'] = this.render.bind(this)
+    window.bpm = this._setBpm.bind(this)
     if(autoLoop) loop(this.tick.bind(this)).start()
   }
 
@@ -251,7 +252,6 @@ class HydraSynth {
       return o
     })
 
-    // set default output
     this.output = this.o[0]
   }
 
@@ -296,23 +296,17 @@ class HydraSynth {
     }
   }
 
-  tick (dt, uniforms) {
-
-  //  if(self.detectAudio === true) self.fft = self.audio.frequencies()
-  // this.regl.frame(function () {
+  tick(dt) {
     this.time += dt * 0.001
-    // console.log(this.time)
-    // this.regl.clear({
-    //   color: [0, 0, 0, 1]
-    // })
     window.time = this.time
+
     if(this.detectAudio === true) this.audio.tick()
+
     for (let i = 0; i < this.s.length; i++) {
       this.s[i].tick(this.time)
     }
 
     for (let i = 0; i < this.o.length; i++) {
-    //  console.log('WIDTH', this.canvas.width, this.o[0].getCurrent())
       this.o[i].tick({
         time: this.time,
         mouse: mouse,
@@ -321,7 +315,6 @@ class HydraSynth {
       })
     }
 
-    // console.log("looping", self.o[0].fbo)
     if (this.isRenderingAll) {
       this.renderAll({
         tex0: this.o[0].getCurrent(),
@@ -331,7 +324,6 @@ class HydraSynth {
         resolution: [this.canvas.width, this.canvas.height]
       })
     } else {
-    //  console.log('out', self.output.id)
       this.renderFbo({
         tex0: this.output.getCurrent(),
         resolution: [this.canvas.width, this.canvas.height]
@@ -342,8 +334,6 @@ class HydraSynth {
       this.saveFrame = false
     }
   }
-
-
 }
 
 module.exports = HydraSynth

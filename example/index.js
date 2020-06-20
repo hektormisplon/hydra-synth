@@ -11,7 +11,7 @@ window.onload = () => {
   new Hydra({
     canvas: canvas,
     enableStreamCapture: true,
-    detectAudio: false
+    detectAudio: true
   })
 
   s0.initCam()

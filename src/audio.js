@@ -16,7 +16,11 @@ class Audio {
     this.smooth = smooth
     this.setBins(numBins)
 
-    // beat detection from: https://github.com/therewasaguy/p5-music-viz/blob/gh-pages/demos/01d_beat_detect_amplitude/sketch.js
+    /* 
+     * Beat detection 
+     * from: https://github.com/therewasaguy/p5-music-viz/blob/gh-pages/demos/01d_beat_detect_amplitude/sketch.js
+     */ 
+
     this.beat = {
       holdFrames: 20,
       threshold: 40,
@@ -31,7 +35,7 @@ class Audio {
     this.canvas.width = 100
     this.canvas.height = 80
     this.canvas.style.width = "100px"
-    this.canvas.style.height = "80px"
+    this.canvas.style.height = "100px"
     this.canvas.style.position = 'absolute'
     this.canvas.style.right = '0px'
     this.canvas.style.bottom = '0px'
@@ -39,35 +43,26 @@ class Audio {
 
     this.isDrawing = isDrawing
     this.ctx = this.canvas.getContext('2d')
-    this.ctx.fillStyle="#DFFFFF"
-    this.ctx.strokeStyle="#0ff"
-    this.ctx.lineWidth=0.5
+    this.ctx.fillStyle = "#000"
+    this.ctx.strokeStyle = "#0ff"
+    this.ctx.lineWidth= 0.5
 
-    window.navigator.mediaDevices.getUserMedia({video: false, audio: true})
+    window.navigator.mediaDevices.getUserMedia({ video: false, audio: true })
       .then((stream) => {
-        console.log('got mic stream', stream)
+        console.log('Mic stream', stream)
         this.stream = stream
         this.context = new AudioContext()
-        //  this.context = new AudioContext()
         let audio_stream = this.context.createMediaStreamSource(stream)
-
-        console.log(this.context)
         this.meyda = Meyda.createMeydaAnalyzer({
           audioContext: this.context,
           source: audio_stream,
-          featureExtractors: [
-            'loudness',
-            //  'perceptualSpread',
-            //  'perceptualSharpness',
-            //  'spectralCentroid'
-          ]
+          featureExtractors: [ 'loudness' ]
         })
       })
-      .catch((err) => console.log('ERROR', err))
+      .catch((error) => console.log(`Stream error: ${JSON.stringify(error, 0, 2)}`))
   }
 
   detectBeat (level) {
-    //console.log(level,   this.beat._cutoff)
     if (level > this.beat._cutoff && level > this.beat.threshold) {
       this.onBeat()
       this.beat._cutoff = level *1.2
@@ -141,16 +136,19 @@ class Audio {
       scale: this.scale,
       smooth: this.smooth
     }))
-    // to do: what to do in non-global mode?
+
+    /* 
+     * TODO: Non-global mode
+     */ 
     this.bins.forEach((bin, i) => {
       window['a' + i] = (scale = 1, offset = 0) => () => (a.fft[i] * scale + offset)
     })
     console.log(this.settings)
   }
 
-  setScale(scale){
+  setScale(scale) {
     this.scale = scale
-    this.settings = this.settings.map((el) => {
+    this.settings = this.settings.map(el => {
       el.scale = scale
       return el
     })
@@ -160,6 +158,7 @@ class Audio {
     this.max = max
     console.log('set max is deprecated')
   }
+
   hide() {
     this.isDrawing = false
     this.canvas.style.display = 'none'
@@ -168,45 +167,31 @@ class Audio {
   show() {
     this.isDrawing = true
     this.canvas.style.display = 'block'
-
   }
 
   draw () {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-    var spacing = this.canvas.width / this.bins.length
-    var scale = this.canvas.height / (this.max * 2)
-    // console.log(this.bins)
+
+    let spacing = this.canvas.width / this.bins.length
+    let scale = this.canvas.height / (this.max * 2)
+
     this.bins.forEach((bin, index) => {
 
-    var height = bin * scale
+      let height = bin * scale
+      this.ctx.fillRect(index * spacing, this.canvas.height - height, spacing, height)
 
-    this.ctx.fillRect(index * spacing, this.canvas.height - height, spacing, height)
+      let y = this.canvas.height - scale*this.settings[index].cutoff
+      this.ctx.beginPath()
+      this.ctx.moveTo(index*spacing, y)
+      this.ctx.lineTo((index+1)*spacing, y)
+      this.ctx.stroke()
 
-     // console.log(this.settings[index])
-    var y = this.canvas.height - scale*this.settings[index].cutoff
-    this.ctx.beginPath()
-    this.ctx.moveTo(index*spacing, y)
-    this.ctx.lineTo((index+1)*spacing, y)
-    this.ctx.stroke()
-
-     var yMax = this.canvas.height - scale*(this.settings[index].scale + this.settings[index].cutoff)
-     this.ctx.beginPath()
-     this.ctx.moveTo(index*spacing, yMax)
-     this.ctx.lineTo((index+1)*spacing, yMax)
-     this.ctx.stroke()
+      let yMax = this.canvas.height - scale*(this.settings[index].scale + this.settings[index].cutoff)
+      this.ctx.beginPath()
+      this.ctx.moveTo(index*spacing, yMax)
+      this.ctx.lineTo((index+1)*spacing, yMax)
+      this.ctx.stroke()
     })
-
-    /*var y = this.canvas.height - scale*this.cutoff
-    this.ctx.beginPath()
-    this.ctx.moveTo(0, y)
-    this.ctx.lineTo(this.canvas.width, y)
-    this.ctx.stroke()
-
-    var yMax = this.canvas.height - scale*this.max
-    this.ctx.beginPath()
-    this.ctx.moveTo(0, yMax)
-    this.ctx.lineTo(this.canvas.width, yMax)
-    this.ctx.stroke()*/
   }
 }
 
