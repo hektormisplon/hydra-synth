@@ -1,16 +1,18 @@
-// to add: ripple: https://www.shadertoy.com/view/4djGzz
-// mask
-// convolution
-// basic sdf shapes
-// repeat
-// iq color palletes
+/* 
+ * TODO: 
+ * ripple: https://www.shadertoy.com/view/4djGzz
+ * mask
+ * convolution
+ * basic sdf shapes
+ * repeat
+ * iq color palletes
+ */
 
 module.exports = {
   _convolution: {
     type: 'renderpass_util',
     glsl: `
       float kernel [9];
-
       vec4 _convolution (vec2 uv, float[9] _kernel, float kernelWeight) {
         vec2 st = uv/resolution.xy;
         vec2 onePixel = vec2(4.0, 4.0) / resolution.xy;

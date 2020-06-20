@@ -1,5 +1,7 @@
-// singleton class that generates ids to use has unique variable names for variables
-// counter.js
+/* 
+ * Singleton class that generates ids 
+ * to be used as unique variable names
+ */
 
 let value = 0
 

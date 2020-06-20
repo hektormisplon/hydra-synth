@@ -25,9 +25,7 @@ class Audio {
       _framesSinceBeat: 0 // keeps track of frames
     }
 
-    this.onBeat = () => {
-      console.log("beat")
-    }
+    this.onBeat = () => console.log("beat")
 
     this.canvas = document.createElement('canvas')
     this.canvas.width = 100
@@ -144,8 +142,8 @@ class Audio {
       smooth: this.smooth
     }))
     // to do: what to do in non-global mode?
-    this.bins.forEach((bin, index) => {
-      window['a' + index] = (scale = 1, offset = 0) => () => (a.fft[index] * scale + offset)
+    this.bins.forEach((bin, i) => {
+      window['a' + i] = (scale = 1, offset = 0) => () => (a.fft[i] * scale + offset)
     })
     console.log(this.settings)
   }
@@ -177,19 +175,19 @@ class Audio {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
     var spacing = this.canvas.width / this.bins.length
     var scale = this.canvas.height / (this.max * 2)
-  //  console.log(this.bins)
+    // console.log(this.bins)
     this.bins.forEach((bin, index) => {
 
-      var height = bin * scale
+    var height = bin * scale
 
-     this.ctx.fillRect(index * spacing, this.canvas.height - height, spacing, height)
+    this.ctx.fillRect(index * spacing, this.canvas.height - height, spacing, height)
 
-  //   console.log(this.settings[index])
-     var y = this.canvas.height - scale*this.settings[index].cutoff
-     this.ctx.beginPath()
-     this.ctx.moveTo(index*spacing, y)
-     this.ctx.lineTo((index+1)*spacing, y)
-     this.ctx.stroke()
+     // console.log(this.settings[index])
+    var y = this.canvas.height - scale*this.settings[index].cutoff
+    this.ctx.beginPath()
+    this.ctx.moveTo(index*spacing, y)
+    this.ctx.lineTo((index+1)*spacing, y)
+    this.ctx.stroke()
 
      var yMax = this.canvas.height - scale*(this.settings[index].scale + this.settings[index].cutoff)
      this.ctx.beginPath()
@@ -197,7 +195,6 @@ class Audio {
      this.ctx.lineTo((index+1)*spacing, yMax)
      this.ctx.stroke()
     })
-
 
     /*var y = this.canvas.height - scale*this.cutoff
     this.ctx.beginPath()

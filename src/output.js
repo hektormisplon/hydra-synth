@@ -1,6 +1,6 @@
 const transforms = require('./glsl-transforms.js')
 
-var Output = function (opts) {
+let Output = function (opts) {
   this.regl = opts.regl
   this.positionBuffer = this.regl.buffer([
     [-2, 0],
@@ -11,7 +11,10 @@ var Output = function (opts) {
   this.clear()
   this.pingPongIndex = 0
 
-  // for each output, create two fbos to use for ping ponging
+  /*
+   * Create two fbos for each output 
+   * to be used for ping ponging
+   */
   this.fbos = (Array(2)).fill().map(() => this.regl.framebuffer({
     color: this.regl.texture({
       width: opts.width,
@@ -21,7 +24,6 @@ var Output = function (opts) {
     depthStencil: false
   }))
 
-  // array containing render passes
   this.passes = []
   // console.log("position", this.positionBuffer)
 }
@@ -47,8 +49,8 @@ Output.prototype.getCurrent = function () {
 }
 
 Output.prototype.getTexture = function () {
-//  return this.fbos[!this.pingPongIndex]
-  var index = this.pingPongIndex ? 0 : 1
+  //  return this.fbos[!this.pingPongIndex]
+  let index = this.pingPongIndex ? 0 : 1
   //  console.log("get texture",index)
   return this.fbos[index]
 }
@@ -128,14 +130,15 @@ Output.prototype.render = function () {
   })
 }
 
-Output.prototype.renderPasses = function(passes) {
-  var self = this
+Output.prototype.renderPasses = function (passes) {
+  let self = this
 //  console.log("passes", passes)
   this.passes = passes.map( (pass, passIndex) => {
 
     //  console.log("get texture",index)
-    var uniforms = Object.assign(pass.uniforms, { prevBuffer:  () =>  {
-           var index = this.pingPongIndex ? 0 : 1
+    let uniforms = Object.assign(pass.uniforms, {
+      prevBuffer: () => {
+        let index = this.pingPongIndex ? 0 : 1
         //  console.log('pass index', passIndex, 'fbo index', index)
          return this.fbos[this.pingPongIndex ? 0 : 1]
         }
@@ -160,7 +163,6 @@ Output.prototype.renderPasses = function(passes) {
 }
 
 Output.prototype.tick = function (props) {
-//  this.draw(props)
   this.passes.forEach((pass) => pass.draw(props))
 }
 
